@@ -1,5 +1,10 @@
 import * as THREE from "three";
 
+// hook up to the canvas
+const renderer = new THREE.WebGLRenderer({
+  canvas: document.getElementById("c")! as HTMLCanvasElement,
+});
+
 // create camera
 const fov = 75;
 const aspect = 2; // the canvas default
@@ -11,6 +16,7 @@ camera.position.z = 2;
 // create scene
 const scene = new THREE.Scene();
 
+// create scene geometry
 const boxWidth = 1;
 const boxHeight = 1;
 const boxDepth = 1;
@@ -19,7 +25,6 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 function makeInstance(geometry: THREE.Geometry, color: number, x: number) {
   const material = new THREE.MeshPhongMaterial({ color });
   const cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
   cube.position.x = x;
   return cube;
 }
@@ -41,4 +46,17 @@ cubes.forEach((c) => scene.add(c));
   scene.add(light);
 }
 
-export { scene, camera };
+// animate things
+function render(time: number) {
+  time *= 0.001; // convert time to seconds
+
+  cubes.forEach((cube) => {
+    cube.rotation.x = time;
+    cube.rotation.y = time;
+  });
+
+  renderer.render(scene, camera);
+
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
